@@ -82,7 +82,7 @@ def build_inbounds_config(myconfig, ipaddr, inbound_tag, mode="tcp", path="/aaa/
 
     :type old_name: 修改模式所需要的参数
     :type port: default 8443
-    :type uuids: None
+    :type uuids: uuidgen
     :type path: url path
     :type name: str 节点名称 default
     :param alert_id: int 0-128

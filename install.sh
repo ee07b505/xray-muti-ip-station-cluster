@@ -234,9 +234,12 @@ remove_all() {
     echo -e "${OK} ${GreenBG} 未检测到脚本，开始下载 ${Font}"
     wget -N --no-check-certificate https://raw.githubusercontent.com/XTLS/Xray-install/main/install-release.sh -O template/install-xray-release.sh
   fi
-  bash template/install-xray-release.sh remove --force
-  rm -rf /usr/local/etc/xray/config.json
+  bash template/install-xray-release.sh remove --purge
 }
 
+
+
+
+
 #remove_all
-install_v2ray_ws
+#install_v2ray_ws

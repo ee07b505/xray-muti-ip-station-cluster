@@ -51,3 +51,9 @@ def create_code(user_config, mode="vmess"):
 
 def clear_quick_link_file():
     os.system("rm -rf vmess_link.txt")
+
+
+def list_node(myconfig):
+    for index, v in enumerate(myconfig.get("inbounds")):
+        print(myconfig.get("inbounds")[index]["ps"])
+

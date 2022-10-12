@@ -3,11 +3,14 @@ import uuid
 import random
 from common.configFactory import *
 from common.outPutFactory import *
+import argparse
 
 log_path = "/var/log/xray/"
 log_level = "warning"
 
-if __name__ == '__main__':
+
+def install(args):
+    print("进入首次安装脚本")
     os.system("bash get-ip.sh")
     myconfig = init_config()
     myconfig = init_log_config(myconfig, log_level, log_path)
@@ -20,10 +23,10 @@ if __name__ == '__main__':
             ipaddr = ann.strip('\n')
             inboundTag = "in-" + ipaddr.replace(".", "-")
             outboundTag = "out-" + ipaddr.replace(".", "-")
-            mode = "tcp"
+            mode = args.mode
             alert_id = 2
 
-            name = sys.argv[1] + "-" + str(name_index)
+            name = args.name + "-" + str(name_index)
             uuids = str(uuid.uuid4())
             path = "/c" + str(uuids).replace("-", "")[0:5] + "c/"
             name_index += 1
@@ -43,3 +46,28 @@ if __name__ == '__main__':
     os.system("systemctl restart xray")
     print("网页链接是：")
     os.system("./template/pastebinit-1.5/pastebinit -i ./vmess_link.txt -b dpaste.com")
+    return
+
+
+def modify(args):
+    return
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Mutilation IP Cluster Server Management Script', prog='PROG')
+    subparsers = parser.add_subparsers(help='choose into sub menu')
+
+    parser_a = subparsers.add_parser('install', help='Full Install')
+    parser_a.add_argument('--name', type=str, help='Prefix name of the generated node')
+    parser_a.add_argument('--mode', type=str, help='Transport Layer Protocol')
+    parser_a.set_defaults(func=install)
+
+    parser_s = subparsers.add_parser('modify', help='Edit the name of a node')
+    parser_s.add_argument('--name', type=str, help='NodeName')
+    parser_s.set_defaults(func=modify)
+
+    parser.add_argument("--list", '-L', default=1, type=int, help="list all nodes in this Cluster server")
+
+    args = parser.parse_args()
+    # 执行函数功能
+    args.func(args)

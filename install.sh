@@ -18,6 +18,11 @@ Warning="${Red}[警告]${Font}"
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
+# 版本
+shell_version="0.0.0.1"
+
+v2ray_access_log="/var/log/xray/access.log"
+v2ray_error_log="/var/log/xray/error.log"
 cd "$(
   cd "$(dirname "$0")" || exit
   pwd
@@ -45,6 +50,7 @@ judge() {
     exit 1
   fi
 }
+
 
 check_system() {
   if [[ "${ID}" == "centos" && ${VERSION_ID} -ge 7 ]]; then
@@ -206,7 +212,7 @@ config_xray() {
   if [ ! "$NodeName" ]; then
     NodeName="Node"
   fi
-  python3 configFactory.py $NodeName
+  python3 configFactory.py install --name $NodeName --mode $1
 }
 
 install_v2ray_ws() {
@@ -216,9 +222,20 @@ install_v2ray_ws() {
   basic_optimization
   old_config_exist_check
   v2ray_install
-  config_xray
-
+  config_xray ws
 }
+
+install_v2ray_tcp() {
+  is_root
+  check_system
+  dependency_install
+  basic_optimization
+  old_config_exist_check
+  v2ray_install
+  config_xray tcp
+}
+
+
 remove_all() {
   if [[  -f template/install-xray-release.sh ]]; then
     echo -e "${OK} ${GreenBG} 检测到内置脚本，是否重新下载安装脚本 [Y/N]? ${Font}"
@@ -241,5 +258,140 @@ remove_all() {
 
 
 
-#remove_all
-#install_v2ray_ws
+
+list() {
+    case $1 in
+    install)
+        install_v2ray_ws
+        ;;
+    uninstall)
+        remove_all
+        ;;
+    *)
+        menu
+        ;;
+    esac
+}
+
+show_access_log() {
+    [ -f ${v2ray_access_log} ] && tail -f ${v2ray_access_log} || echo -e "${RedBG}log文件不存在${Font}"
+}
+
+show_error_log() {
+    [ -f ${v2ray_error_log} ] && tail -f ${v2ray_error_log} || echo -e "${RedBG}log文件不存在${Font}"
+}
+
+
+list_node() {
+    python3 configFactory.py --list
+}
+
+menu() {
+    echo -e "\t xray站群服务器 安装管理脚本 ${Red}[${shell_version}]${Font}"
+    echo -e "\t---authored by PaperDragon---"
+    echo -e "\thttps://github.com/Paper-Dragon\n"
+    echo -e "当前已安装版本:${shell_mode}\n"
+
+    echo -e "—————————————— 安装向导 ——————————————"""
+    echo -e "${Green}0.${Font}  升级 脚本"
+    echo -e "${Green}1.${Font}  安装 V2Ray (ws)"
+    echo -e "${Green}2.${Font}  安装 V2Ray (http/2)"
+    echo -e "${Green}3.${Font}  升级 V2Ray core"
+#    echo -e "—————————————— 配置变更 ——————————————"
+#    echo -e "${Green}4.${Font}  变更 UUID"
+#    echo -e "${Green}6.${Font}  变更 port"
+#    echo -e "${Green}7.${Font}  变更 TLS 版本(仅ws+tls有效)"
+#    echo -e "${Green}18.${Font}  变更伪装路径"
+    echo -e "—————————————— 查看信息 ——————————————"
+    echo -e "${Green}8.${Font}  查看 实时访问日志"
+    echo -e "${Green}9.${Font}  查看 实时错误日志"
+    echo -e "${Green}10.${Font} 查看 V2Ray 配置信息"
+#    echo -e "—————————————— 其他选项 ——————————————"
+#    echo -e "${Green}11.${Font} 安装 4合1 bbr 锐速安装脚本"
+#    echo -e "${Green}12.${Font} 安装 MTproxy(支持TLS混淆)"
+#    echo -e "${Green}13.${Font} 证书 有效期更新"
+#    echo -e "${Green}14.${Font} 卸载 V2Ray"
+#    echo -e "${Green}15.${Font} 更新 证书crontab计划任务"
+#    echo -e "${Green}16.${Font} 清空 证书遗留文件"
+    echo -e "${Green}17.${Font} 退出 \n"
+
+    read -rp "请输入数字：" menu_num
+    case $menu_num in
+    0)
+        echo "功能待完善"
+        ;;
+    1)
+        shell_mode="ws"
+        install_v2ray_ws
+        ;;
+    2)
+        shell_mode="tcp"
+        install_v2ray_tcp
+        ;;
+    3)
+        bash template/install-xray-release.sh check
+        ;;
+    4)
+#        read -rp "请输入UUID:" UUID
+#        modify_UUID
+#        start_process_systemd
+        echo "功能待完善"
+        ;;
+#    6)
+#        read -rp "请输入连接端口:" port
+#        if grep -q "ws" $v2ray_qr_config_file; then
+#            modify_nginx_port
+#        elif grep -q "h2" $v2ray_qr_config_file; then
+#            modify_inbound_port
+#        fi
+#        start_process_systemd
+#        echo "功能待完善"
+#        ;;
+#    7)
+#        tls_type
+#        ;;
+    8)
+        show_access_log
+        ;;
+    9)
+        show_error_log
+        ;;
+    10)
+        list_node
+        ;;
+#    11)
+#        bbr_boost_sh
+#        ;;
+#    12)
+#        mtproxy_sh
+#        ;;
+#    13)
+#        stop_process_systemd
+#        ssl_update_manuel
+#        start_process_systemd
+#        ;;
+#    14)
+#        source '/etc/os-release'
+#        uninstall_all
+#        ;;
+#    15)
+#        acme_cron_update
+#        ;;
+#    16)
+#        delete_tls_key_and_crt
+#        ;;
+    17)
+        exit 0
+        ;;
+#    18)
+#        read -rp "请输入伪装路径(注意！不需要加斜杠 eg:ray):" camouflage_path
+#        modify_camouflage_path
+#        start_process_systemd
+#        ;;
+    *)
+        echo -e "${RedBG}请输入正确的数字${Font}"
+        ;;
+    esac
+}
+
+list "$1"

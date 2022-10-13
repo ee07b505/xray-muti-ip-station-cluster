@@ -45,36 +45,76 @@ cd xray-muti-ip-station-cluster && bash install.sh install
 cd xray-muti-ip-station-cluster && bash install.sh uninstall
 ```
 
+
+
+### Menu
+```bash
+(PyCharmProject) [root@monther PyCharmProject]# bash install.sh 
+         xray站群服务器 安装管理脚本 [0.0.0.1]
+           仅适用与站群服务器 乱用后果自负 
+        ---authored by PaperDragon---
+        https://github.com/Paper-Dragon
+
+当前已安装版本: 0.0.0.1
+
+—————————————— 安装向导 ——————————————
+0.  升级 脚本
+1.  安装 V2Ray (ws)
+2.  安装 V2Ray (http/2)
+3.  升级 V2Ray core
+—————————————— 配置变更 ——————————————
+4.  变更 传输层协议
+6.  变更 port
+—————————————— 查看信息 ——————————————
+8.  查看 实时访问日志
+9.  查看 实时错误日志
+10. 查看 V2Ray 配置信息
+—————————————— 其他选项 ——————————————
+14. 卸载 V2Ray
+17. 退出 
+
+请输入数字：^C
+
+
+
+
+```
+
+
+
+
 ### 扩展用法
 
 #### main menu
 
 ```bash
-(PyCharmProject) [root@monther PyCharmProject]# python configFactory.py --help
-usage: PROG [-h] [--list LIST] {install,modify} ...
+(PyCharmProject) [root@monther PyCharmProject]# python configFactory.py  --help
+usage: configFactory.py [-h] [--list] {install,modify} ...
 
 Mutilation IP Cluster Server Management Script
 
 positional arguments:
-  {install,modify}      choose into sub menu
-    install             Full Install
-    modify              Edit the name of a node
+  {install,modify}  choose into sub menu
+    install         Full Install
+    modify          Edit the name of a node
 
 optional arguments:
-  -h, --help            show this help message and exit
-  --list LIST, -L LIST  list all nodes in this Cluster server
+  -h, --help        show this help message and exit
+  --list, -L        list all nodes in this Cluster server
+
 ```
 
 #### Install
 
 ```bash
-(PyCharmProject) [root@monther PyCharmProject]# python configFactory.py install --help
-usage: PROG install [-h] [--name NAME] [--mode MODE]
+(PyCharmProject) [root@monther PyCharmProject]# python configFactory.py install  --help
+usage: configFactory.py install [-h] [--name NAME] [--mode MODE]
 
 optional arguments:
   -h, --help   show this help message and exit
   --name NAME  Prefix name of the generated node
   --mode MODE  Transport Layer Protocol
+
 
 ```
 
@@ -82,11 +122,16 @@ optional arguments:
 
 ```bash
 (PyCharmProject) [root@monther PyCharmProject]# python configFactory.py modify --help
-usage: PROG modify [-h] [--name NAME]
+usage: configFactory.py modify [-h] [--name NAME] [--port PORT]
+                               [--network NETWORK] [--path PATH]
 
 optional arguments:
-  -h, --help   show this help message and exit
-  --name NAME  NodeName
+  -h, --help         show this help message and exit
+  --name NAME        NodeName
+  --port PORT        Port
+  --network NETWORK  Network
+  --path PATH        path
+
 
 ```
 

@@ -1,6 +1,6 @@
 # 初始化
-import json
 import os.path
+from common.outPutFactory import *
 
 
 def init_config():
@@ -152,6 +152,7 @@ def modify_inbounds_config(myconfig, old_name, args):
     """
     for index, v in enumerate(myconfig.get("inbounds")):
         if v.get("ps") == old_name:
+            uuid = v["settings"]["clients"][0].get("id")
             if args.port is not None:
                 myconfig.get("inbounds")[index]["port"] = args.port
             if myconfig.get("inbounds")[index]["streamSettings"].get("network") == "ws" and args.network == "tcp":
@@ -160,13 +161,37 @@ def modify_inbounds_config(myconfig, old_name, args):
                 }
 
             if myconfig.get("inbounds")[index]["streamSettings"].get("network") == "tcp" and args.network == "ws":
+                path = "/c" + str(uuid).replace("-", "")[0:5] + "c/"
                 myconfig.get("inbounds")[index]["streamSettings"] = {
                     "network": args.network,
                     "wsSettings": {
-                        "path": args.path
+                        "path": path
                     }
                 }
             print("这个节点的配置是", json.dumps(v, indent=4, separators=(',', ': ')))
+            mode = v["streamSettings"].get('network')
+            address = v.get('listen')
+
+            port = v.get("port")
+            alert_id = v["settings"]["clients"][0].get("alert_id")
+
+            if mode == 'tcp':
+                create_quick_link(ps=old_name, address=address, uuid=uuid, port=port, alert_id=alert_id, mode=mode,
+                                  path=None)
+            elif mode == "ws":
+                """
+                    "streamSettings": {
+                        "network": "ws",
+                        "wsSettings": {
+                            "path": path
+                    }
+                """
+                path = v["streamSettings"]["wsSettings"].get('path')
+                create_quick_link(ps=old_name, address=address, uuid=uuid, port=port, alert_id=alert_id, mode=mode,
+                                  path=path)
+            else:
+                print("生成链接失败，请检测配置")
+
     return myconfig
 
 

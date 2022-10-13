@@ -33,8 +33,13 @@ def install(args):
             myconfig = build_routing_config(myconfig, inboundTag, outboundTag)
             myconfig = build_default_outbounds_config(myconfig, ipaddr, outboundTag)
             myconfig = build_inbounds_config(myconfig, ipaddr, inboundTag, mode, path, uuids, alert_id, name, port)
+            if mode == "tcp":
+                create_quick_link(name, ipaddr, uuids, port=port, alert_id=alert_id, mode=mode, path=None)
+            elif mode == "ws":
+                create_quick_link(name, ipaddr, uuids, port=port, alert_id=alert_id, mode=mode, path=path)
+            else:
+                print(f"{mode}出现问题！")
 
-            create_quick_link(name, ipaddr, uuids, port=port, alert_id=alert_id, mode=mode, path=path)
 
     json_data = json.dumps(myconfig, indent=4, separators=(',', ': '))
 
@@ -66,6 +71,7 @@ def modify(args):
     fp.write(json_data)
     fp.close()
     restart_xray()
+
     return
 
 

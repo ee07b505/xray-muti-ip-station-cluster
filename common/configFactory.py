@@ -1,4 +1,5 @@
 # 初始化
+import json
 import os.path
 
 
@@ -77,12 +78,11 @@ def build_default_outbounds_config(myconfig, ipaddr, outbound_tag):
 
 
 def build_inbounds_config(myconfig, ipaddr, inbound_tag, mode="tcp", path="/aaa/", uuids=" ", alert_id=2,
-                          name="default", port=8443, old_name="default"):
+                          name="default", port=8443):
     """
 
-    :type old_name: 修改模式所需要的参数
-    :type port: default 8443
-    :type uuids: uuidgen
+    :type port: int default 8443
+    :type uuids: uuid gen
     :type path: url path
     :type name: str 节点名称 default
     :param alert_id: int 0-128
@@ -140,34 +140,44 @@ def build_inbounds_config(myconfig, ipaddr, inbound_tag, mode="tcp", path="/aaa/
             }
         )
         return myconfig
-    elif mode == "modify":
-        for index, v in enumerate(myconfig.get("inbounds")):
-            if v.get("ps") == old_name:
-                myconfig.get("inbounds")[index]["port"] = port
-                myconfig.get("inbounds")[index]["listen"] = ipaddr
-                myconfig.get("inbounds")[index]["tag"] = inbound_tag
-                myconfig.get("inbounds")[index]["ps"] = name
-                myconfig.get("inbounds")[index]["settings"] = {
-                    "clients": [
-                        {
-                            "id": uuids,
-                            "alterId": alert_id
-                        }
-                    ]
-                }
+
+
+def modify_inbounds_config(myconfig, old_name, args):
+    """
+
+    :param args: args
+    :param myconfig: json config
+    :param old_name: node name
+    :return: json config
+    """
+    for index, v in enumerate(myconfig.get("inbounds")):
+        if v.get("ps") == old_name:
+            if args.port is not None:
+                myconfig.get("inbounds")[index]["port"] = args.port
+            if myconfig.get("inbounds")[index]["streamSettings"].get("network") == "ws" and args.network == "tcp":
                 myconfig.get("inbounds")[index]["streamSettings"] = {
-                    "network": "ws",
+                    "network": "tcp"
+                }
+
+            if myconfig.get("inbounds")[index]["streamSettings"].get("network") == "tcp" and args.network == "ws":
+                myconfig.get("inbounds")[index]["streamSettings"] = {
+                    "network": args.network,
                     "wsSettings": {
-                        "path": path
+                        "path": args.path
                     }
                 }
-        return myconfig
+            print("这个节点的配置是", json.dumps(v, indent=4, separators=(',', ': ')))
+    return myconfig
 
 
 def old_config_exist_check():
     if os.path.exists("/usr/local/etc/xray/config.json"):
         return True
     return False
+
+
+def restart_xray():
+    os.system("systemctl restart xray")
 
 
 def is_root():

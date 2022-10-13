@@ -54,6 +54,6 @@ def clear_quick_link_file():
 
 
 def list_node(myconfig):
-    for index, v in enumerate(myconfig.get("inbounds")):
-        print(myconfig.get("inbounds")[index]["ps"])
-
+    print("现在有如下节点")
+    for v in myconfig.get("inbounds"):
+        print(v["ps"])

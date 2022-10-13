@@ -1,4 +1,3 @@
-import sys
 import uuid
 import random
 from common.configFactory import *
@@ -36,25 +35,54 @@ def install(args):
             myconfig = build_inbounds_config(myconfig, ipaddr, inboundTag, mode, path, uuids, alert_id, name, port)
 
             create_quick_link(name, ipaddr, uuids, port=port, alert_id=alert_id, mode=mode, path=path)
-    # print(myconfig)
 
     json_data = json.dumps(myconfig, indent=4, separators=(',', ': '))
 
     f = open('/usr/local/etc/xray/config.json', 'w')
     f.write(json_data)
     f.close()
-    os.system("systemctl restart xray")
+    restart_xray()
     print("网页链接是：")
     os.system("./template/pastebinit-1.5/pastebinit -i ./vmess_link.txt -b dpaste.com")
     return
 
 
 def modify(args):
+    fp = open('/usr/local/etc/xray/config.json', "r", encoding='utf-8')
+    myconfig = json.load(fp=fp)
+    fp.close()
+    """
+    :param myconfig: json config
+    :param old_name: node name
+    :param new_port: int 0-65535
+    :param new_network: str ws,tcp
+    :param new_path: str path
+    :return: json config
+    """
+
+    myconfig = modify_inbounds_config(myconfig, old_name=args.name, args=args)
+    json_data = json.dumps(myconfig, indent=4, separators=(',', ': '))
+    fp = open('/usr/local/etc/xray/config.json', "w", encoding='utf-8')
+    fp.write(json_data)
+    fp.close()
+    restart_xray()
+    return
+
+
+def node_list(args):
+    fp = open('/usr/local/etc/xray/config.json', "r", encoding='utf-8')
+    myconfig = json.load(fp)
+    list_node(myconfig=myconfig)
+    fp.close()
     return
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Mutilation IP Cluster Server Management Script', prog='PROG')
+    parser = argparse.ArgumentParser(description='Mutilation IP Cluster Server Management Script',
+                                     prog='configFactory.py')
+    parser.add_argument("--list", '-L', action='store_true', default=False,
+                        help="list all nodes in this Cluster server")
+    parser.set_defaults(func=node_list)
     subparsers = parser.add_subparsers(help='choose into sub menu')
 
     parser_a = subparsers.add_parser('install', help='Full Install')
@@ -64,9 +92,10 @@ if __name__ == '__main__':
 
     parser_s = subparsers.add_parser('modify', help='Edit the name of a node')
     parser_s.add_argument('--name', type=str, help='NodeName')
+    parser_s.add_argument('--port', type=int, help='Port')
+    parser_s.add_argument('--network', type=str, help='Network')
+    parser_s.add_argument('--path', type=str, help='path')
     parser_s.set_defaults(func=modify)
-
-    parser.add_argument("--list", '-L', default=1, type=int, help="list all nodes in this Cluster server")
 
     args = parser.parse_args()
     # 执行函数功能

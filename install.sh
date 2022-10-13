@@ -288,9 +288,10 @@ list_node() {
 
 menu() {
     echo -e "\t xray站群服务器 安装管理脚本 ${Red}[${shell_version}]${Font}"
+    echo -e "\t  ${Red} 仅适用与站群服务器 乱用后果自负 ${Font}"
     echo -e "\t---authored by PaperDragon---"
     echo -e "\thttps://github.com/Paper-Dragon\n"
-    echo -e "当前已安装版本:${shell_mode}\n"
+    echo -e "当前已安装版本: ${shell_version}\n"
 
     echo -e "—————————————— 安装向导 ——————————————"""
     echo -e "${Green}0.${Font}  升级 脚本"

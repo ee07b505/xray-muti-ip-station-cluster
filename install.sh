@@ -170,15 +170,15 @@ old_config_exist_check() {
 }
 
 v2ray_install() {
-#  if [[ -f /usr/local/bin/xray ]]; then
-#    echo -e "${OK} ${GreenBG} 检测到已经安装，正在删除 ${Font}"
-#    bash template/install-xray-release.sh remove
-#  fi
-#
-#  if [[ -f /usr/local/etc/xray/config.json ]]; then
-#    bash rm -rf /usr/local/etc/xray
-#    judge "已删除旧配置"
-#  fi
+  if [[ -f /usr/local/bin/xray ]]; then
+    echo -e "${OK} ${GreenBG} 检测到已经安装，正在删除 ${Font}"
+    bash template/install-xray-release.sh remove
+  fi
+
+  if [[ -f /usr/local/etc/xray/config.json ]]; then
+    bash rm -rf /usr/local/etc/xray
+    judge "已删除旧配置"
+  fi
   if [[  -f template/install-xray-release.sh ]]; then
     echo -e "${OK} ${GreenBG} 检测到内置脚本，是否重新下载安装脚本 [Y/N]? ${Font}"
     read -r down_xray_install
@@ -196,7 +196,7 @@ v2ray_install() {
 
   if [[ -f template/install-xray-release.sh ]]; then
     systemctl daemon-reload
-    #bash template/install-xray-release.sh install
+    bash template/install-xray-release.sh install
     judge "安装 xray"
   else
     echo -e "${Error} ${RedBG} V2ray 安装文件下载失败，请检查下载地址是否可用 ${Font}"
@@ -297,20 +297,20 @@ menu() {
     echo -e "${Green}1.${Font}  安装 V2Ray (ws)"
     echo -e "${Green}2.${Font}  安装 V2Ray (http/2)"
     echo -e "${Green}3.${Font}  升级 V2Ray core"
-#    echo -e "—————————————— 配置变更 ——————————————"
-#    echo -e "${Green}4.${Font}  变更 UUID"
-#    echo -e "${Green}6.${Font}  变更 port"
+    echo -e "—————————————— 配置变更 ——————————————"
+    echo -e "${Green}4.${Font}  变更 传输层协议"
+    echo -e "${Green}6.${Font}  变更 port"
 #    echo -e "${Green}7.${Font}  变更 TLS 版本(仅ws+tls有效)"
 #    echo -e "${Green}18.${Font}  变更伪装路径"
     echo -e "—————————————— 查看信息 ——————————————"
     echo -e "${Green}8.${Font}  查看 实时访问日志"
     echo -e "${Green}9.${Font}  查看 实时错误日志"
     echo -e "${Green}10.${Font} 查看 V2Ray 配置信息"
-#    echo -e "—————————————— 其他选项 ——————————————"
+    echo -e "—————————————— 其他选项 ——————————————"
 #    echo -e "${Green}11.${Font} 安装 4合1 bbr 锐速安装脚本"
 #    echo -e "${Green}12.${Font} 安装 MTproxy(支持TLS混淆)"
 #    echo -e "${Green}13.${Font} 证书 有效期更新"
-#    echo -e "${Green}14.${Font} 卸载 V2Ray"
+    echo -e "${Green}14.${Font} 卸载 V2Ray"
 #    echo -e "${Green}15.${Font} 更新 证书crontab计划任务"
 #    echo -e "${Green}16.${Font} 清空 证书遗留文件"
     echo -e "${Green}17.${Font} 退出 \n"
@@ -318,7 +318,7 @@ menu() {
     read -rp "请输入数字：" menu_num
     case $menu_num in
     0)
-        echo "功能待完善"
+        git pull
         ;;
     1)
         shell_mode="ws"
@@ -332,21 +332,17 @@ menu() {
         bash template/install-xray-release.sh check
         ;;
     4)
-#        read -rp "请输入UUID:" UUID
-#        modify_UUID
-#        start_process_systemd
-        echo "功能待完善"
+        python3 configFactory.py --list
+        read -rp "请输入节点名称:" modify_name
+        read -rp "请输入连接协议[ws/tcp]:" modify_network
+        python3 configFactory.py modify --name "$modify_name" --network "$modify_network"
         ;;
-#    6)
-#        read -rp "请输入连接端口:" port
-#        if grep -q "ws" $v2ray_qr_config_file; then
-#            modify_nginx_port
-#        elif grep -q "h2" $v2ray_qr_config_file; then
-#            modify_inbound_port
-#        fi
-#        start_process_systemd
-#        echo "功能待完善"
-#        ;;
+    6)
+        python3 configFactory.py --list
+        read -rp "请输入节点名称:" modify_name
+        read -rp "请输入连接端口:" modify_port
+        python3 configFactory.py modify --name "$modify_name" --port "$modify_port"
+        ;;
 #    7)
 #        tls_type
 #        ;;
@@ -370,10 +366,10 @@ menu() {
 #        ssl_update_manuel
 #        start_process_systemd
 #        ;;
-#    14)
-#        source '/etc/os-release'
-#        uninstall_all
-#        ;;
+    14)
+        source '/etc/os-release'
+        remove_all
+        ;;
 #    15)
 #        acme_cron_update
 #        ;;

@@ -40,7 +40,16 @@ def init_routing_config(myconfig):
                 "geoip:private"
             ],
             "outboundTag": "out-block"
+        },
+        {
+            "type": "field",
+            "domain": [
+                "baidu.com",
+                "www.baidu.com"
+            ],
+            "outboundTag": "out-block"
         }
+
     )
     return myconfig
 

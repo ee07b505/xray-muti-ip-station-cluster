@@ -23,7 +23,7 @@ def install(args):
             inboundTag = "in-" + ipaddr.replace(".", "-")
             outboundTag = "out-" + ipaddr.replace(".", "-")
             mode = args.mode
-            alert_id = 2
+            alert_id = 0
 
             name = args.name + "-" + str(name_index)
             uuids = str(uuid.uuid4())

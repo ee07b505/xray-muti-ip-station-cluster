@@ -42,6 +42,15 @@ def init_routing_config(myconfig):
             "outboundTag": "out-block"
         }
     )
+    myconfig["routing"].get("rules").append(
+        {
+            "type": "field",
+            "domain": [
+                "tiktokcdn.com"
+            ],
+            "outboundTag": "out-block"
+        }
+    )
     return myconfig
 
 

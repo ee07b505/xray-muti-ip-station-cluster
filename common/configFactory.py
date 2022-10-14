@@ -40,16 +40,16 @@ def init_routing_config(myconfig):
                 "geoip:private"
             ],
             "outboundTag": "out-block"
-        },
+        }
+    )
+    myconfig["routing"].get("rules").append(
         {
             "type": "field",
             "domain": [
-                "baidu.com",
-                "www.baidu.com"
+                "tiktokcdn.com"
             ],
             "outboundTag": "out-block"
         }
-
     )
     return myconfig
 
